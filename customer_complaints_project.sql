@@ -17,9 +17,9 @@ order by `Date submitted`;
 -- Result: on average, there are 27.09 complaints submitted per day.
 select avg(num_complaints) as avg_num_complaints_per_day
 from (
-		select `Date submitted`, count(distinct `complaint ID`) as num_complaints
-		from consumer_complaints
-		group by `Date submitted`
+	select `Date submitted`, count(distinct `complaint ID`) as num_complaints
+	from consumer_complaints
+	group by `Date submitted`
 ) as daily_counts;
 
 -- Find number of complaints per year to see if there is any pattern or trends.
@@ -132,31 +132,25 @@ from consumer_complaints;
 -- the third highest product (4011) was 'Credit reporting' with a main issue related to 'Incorrect information on your report'.
 -- As the most common banking service people uses is the checking account, it is understandable to see that 'checking account' product 
 -- has outstanding number of complaints above anything else.  
-select Product, `Sub-product`, Issue, COUNT(*) as complaint_count
+select Product, `Sub-product`, Issue, count(*) as complaint_count
 from consumer_complaints
-GROUP BY Product, `Sub-product`, Issue
-ORDER BY complaint_count DESC;
+group by Product, `Sub-product`, Issue
+order by complaint_count desc;
 
 -- to further investigate, rank the Product-Issue from the highest to lowest
 -- so it first ranks each bigger category of product that received the most complaints
 -- and for each product, it ranks the issues related to that product
 with product_rank as
 (
-	select 
-		Product, 
-		rank() over (order by count(*) desc) as product_rank
+	select Product, rank() over (order by count(*) desc) as product_rank
 	from consumer_complaints
 	group by Product
 ),
 issue_rank as
 (
-	select
-		Product,
-        Issue,
-        count(*) as complaint_count,
-        rank() over (partition by product order by count(*) desc) as issue_rank
+	select Product, Issue, count(*) as complaint_count, rank() over (partition by product order by count(*) desc) as issue_rank
 	from consumer_complaints
-    group by Product, Issue
+    	group by Product, Issue
 )
 select pr.Product, ir.Issue, ir.complaint_count, pr.product_rank, ir.issue_rank
 from product_rank pr
