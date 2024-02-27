@@ -39,7 +39,8 @@ Notably, 2019 marked the year with the lowest number of complaints, which is a p
 ![image](https://github.com/Su-Jung-Choi/consumer_complaints_project/assets/88897881/0fc551be-8a1e-48dd-97d0-c0a86ea48ddc)
 
 5. To break down the 'In Progress' complaints, they were grouped by month, and the results below show that Bank of America received 'In Progress' complaints between June and August. Considering that 60 days before September 14th is July 16th, the 'In Progress' status was filtered for complaints received between June 1st to July 15th, totaling 378. These complaints are anticipated to be labeled as late responses, suggesting that Bank of America might not show improvement in terms of timeliness in 2023 compared to 2022.
-<!-- According to [CFPB](https://www.consumerfinance.gov/complaint/data-use/), the data is published "after the company responds or after **15 days**, whichever comes first." -->
+<!-- According to [CFPB](https://www.consumerfinance.gov/complaint/data-use/), the data is published "after the company responds or after **15 days**, whichever comes first." 
+By ordering the dataset based on the 'Date received' column, I found the latest complaint in the dataset was received on August 28, 2023. Then we can assume the data extraction is done around September 14th. -->
 
 ![image](https://github.com/Su-Jung-Choi/consumer_complaints_project/assets/88897881/e0723997-293a-405d-bfab-d8d712430f93)
 
