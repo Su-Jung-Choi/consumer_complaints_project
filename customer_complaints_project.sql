@@ -31,7 +31,9 @@ order by extracted_year;
 
 -- To further investigate, check if it contains all data for 2017.
 -- Result: it is found that the data starts from May 2017, so it does not include the data for January through April.
-select extract(month from `Date submitted`) as extracted_month, extract(year from `Date submitted`) as extracted_year, count(*) as num_complaints
+select extract(month from `Date submitted`) as extracted_month, 
+		extract(year from `Date submitted`) as extracted_year, 
+        count(*) as num_complaints
 from consumer_complaints
 group by extracted_month, extracted_year
 having extracted_year = 2017
@@ -52,7 +54,7 @@ drop view if exists consumer_complaints_2018_to_2022;
 create view consumer_complaints_2018_to_2022 as
 select *
 from consumer_complaints
-where extract(year from `Date submitted`) between 2018 and 2022;
+where `Date submitted` >= '2018-01-01' and `Date submitted` <= '2022-12-31';
 
 -- check again for the years 2018 to 2022 to see the number of complaints for each year
 -- result: The count increases from 7872 in 2018 to 12953 in 2022, indicating an overall upward trend in the number of complaints over these years.
@@ -106,12 +108,14 @@ from consumer_complaints
 group by days_difference
 order by days_difference;
 
--- Overall, the average days it takes is 1.2249 days
+-- Overall, the average days it takes is about 1.22 days
 select avg(DATEDIFF(`Date received`, `Date submitted`)) as days_difference
 from consumer_complaints;
 
 -- count how many null values each column contains 
 -- (the data contains empty strings instead of nulls, so here it is checking the empty strings)
+-- result: Sub-product column contains 7 nulls; Sub-issue contains 10858 nulls; public response contains 2175 nulls; timely response contains 1494 nulls
+-- there are products and issues that do not have applicable subproducts and subissues, so they are blank but not missing data.
 select sum(case when `Submitted via` = '' then 1 else 0 end) as submit_via_null_count,
         sum(case when `Date submitted` = '' then 1 else 0 end) as date_submit_null_count,
         sum(case when `Date received` = '' then 1 else 0 end) as date_receive_null_count,
@@ -132,10 +136,10 @@ from consumer_complaints;
 -- the third highest product (4011) was 'Credit reporting' with a main issue related to 'Incorrect information on your report'.
 -- As the most common banking service people uses is the checking account, it is understandable to see that 'checking account' product 
 -- has outstanding number of complaints above anything else.  
-select Product, `Sub-product`, Issue, COUNT(*) as complaint_count
+select Product, `Sub-product`, Issue, count(*) as complaint_count
 from consumer_complaints
-GROUP BY Product, `Sub-product`, Issue
-ORDER BY complaint_count DESC;
+group by Product, `Sub-product`, Issue
+order by complaint_count desc;
 
 -- to further investigate, rank the Product-Issue from the highest to lowest
 -- so it first ranks each bigger category of product that received the most complaints
@@ -164,10 +168,10 @@ join issue_rank ir on pr.Product = ir.Product
 order by pr.product_rank, ir.issue_rank;
 
 -- find company's public response.
--- result: The majority cases (60311), Bank of America chose not to provide a public response and it solved with the consumer and CFPB directly
+-- result: The majority cases (60311), Bank of America chose not to provide a public response and it solved with the consumer and CFPB directly.
 -- there are only few cases that the company provide public response and those are mainly when the company believes they were not the problem.
 -- for example, company's action was appropriate according to the law, the problem was caused by external factors, or consumer's misunderstanding. 
--- it might be worth taking deeper analysis whether "not providing public response" has not had any downsides to the company
+-- it might be worth taking deeper analysis whether "not providing public response" has not had any downsides to the company.
 select `Company public response`, count(*) as num_response
 from consumer_complaints
 group by `Company public response`
@@ -184,9 +188,11 @@ order by num_response;
 -- Note: According to CFPB, the criteria for "timeply responses" is based on the final response period of 60 days
 -- from the date the company received a complaint.
 -- Also, the 'Timely response?' column is marked to be Yes or No by CFPB after the company gave a response.
--- result: the majority answered Yes to the 'Timely response?' (58619),
--- which is positive result showing Bank of America address issues with responsibility.
-select `Timely response?`, count(*) as count_response
+-- result: the majority answered Yes to the 'Timely response?' (58619) vs. Not timely response (2403)
+-- which is positive result showing that Bank of America address issues with responsibility.
+select `Timely response?`, 
+		count(*) as count_response, 
+        (count(*) / (select count(*) from consumer_complaints)) * 100 as percentage
 from consumer_complaints
 group by `Timely response?`;
 
@@ -215,9 +221,16 @@ order by num_response desc;
 -- largest number of late response (1224). Then it goes down to 560 in 2022, which can show
 -- Bank of America is trying to get better at the timeliness. However, in 2023 again, 
 -- there are already 529 late responses by August.
-select extract(year from `Date received`) as extracted_year, count(*) as num_late_response
-from consumer_complaints
-where `Timely response?` = 'No'
+select extracted_year, 
+	   count(*) as num_late_response,
+	   (count(*) / total_complaints_per_year) * 100 as percentage
+from (select extract(year from `Date received`) as extracted_year,
+			 count(*) as total_complaints_per_year
+	  from consumer_complaints
+      group by extracted_year
+) as yearly_count
+join consumer_complaints as cc on extract(year from cc.`Date received`) = yearly_count.extracted_year
+where cc.`Timely response?` = 'No'
 group by extracted_year
 order by extracted_year;
 
@@ -235,16 +248,17 @@ limit 5;
 -- were already received by Bank of America in between June through August. 
 -- (June: 21, July: 836, August: 637)
 -- as CFPB considers timeliness to be within 60 days from the date the company received complaints,
--- some of these "in progress" status would be marked late responses in the end.
+-- some of these "in progress" status would be marked as late responses in the end.
 select `Company response to consumer`, extract(month from `Date received`) as extracted_month, 
-		extract(year from `Date received`) as extracted_year, count(*) as num_complaints
+		extract(year from `Date received`) as extracted_year, 
+        count(*) as num_complaints
 from consumer_complaints
 group by `Company response to consumer`, extracted_month, extracted_year
 having `Company response to consumer` = 'In progress'
 order by extracted_month;
 
--- assuming the data was extracted in September 14th, 60 days prior to that point is July 16th.
--- thus, filter the "In progress" status in between June 1st to 15th to see those that will be most likely 
+-- assuming the data was extracted on September 14th, 60 days prior to that point is July 16th.
+-- thus, filter the "In progress" status in between June 1st to July 15th to see those that will be most likely 
 -- marked as late response.
 select `Company response to consumer`, 
 		extract(year from `Date received`) as extracted_year, 
