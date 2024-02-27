@@ -1,7 +1,7 @@
 # 🏦 Bank of America Consumer Complaints Data Analysis
 
 
-In this personal project, I used MySQL to analyze consumer complaints data regarding Bank of America's products and services. The dataset includes complaints submitted to the Consumer Financial Protection Bureau (CFPB) from 2017 to 2023. \
+In this personal project, I used MySQL to analyze consumer complaints data regarding Bank of America's products and services. The dataset includes complaints submitted to the Consumer Financial Protection Bureau (CFPB) from 2017 to 2023. 
 
 🌼 Dataset Link: [Maven Analytics](https://www.mavenanalytics.io/data-playground)
 
@@ -45,7 +45,7 @@ Notably, 2019 marked the year with the lowest number of complaints, which is a p
 
 ![image](https://github.com/Su-Jung-Choi/consumer_complaints_project/assets/88897881/85885455-8849-4250-b580-a4e66090e7b8)
 
-## Conclusion
+## Conclusion:
 Through this comprehensive data exploration and analysis, we have uncovered insightful patterns. 
 * Bank of America experienced its lowest number of complaints in 2019, indicating a positive trend. However, since 2018, there has been a consistent increase in the overall complaint count. 
 * The product that present the most complaints and the associated issue were the 'checking account' product and the 'Managing an account' issue, respectively. 
