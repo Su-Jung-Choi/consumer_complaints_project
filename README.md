@@ -56,4 +56,4 @@ Through this comprehensive data exploration and analysis, we have uncovered insi
 > [!NOTE]
 > For a detailed exploration of the data and results, check out the **'customer_complaints_project.sql'** file.\
 > I also created a dashboard using **Tableau** to visualize the key findings from this data analysis.\
-> To view and interact with the Tableau dashboard, visit [here](https://public.tableau.com/app/profile/sujung.choi/viz/customer_complaints_17088190139230/Dashboard1)
+> To view and interact with the Tableau dashboard, visit [here](https://public.tableau.com/views/customer_complaints_17088190139230/Dashboard1?:language=en-US&publish=yes&:sid=&:display_count=n&:origin=viz_share_link)
